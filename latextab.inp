@@ -1,0 +1,200 @@
+# public functions
+
+function void latextab (matrix mprint,
+      string cnames "Space sep. string of columns",
+      string rnames "Space sep. string of rows",
+      string capt,
+      string lab,
+      string note,
+      string path "Path for tex-file",
+      int dec[0:6:3] "# of decimal places",
+      string fontsize "Use latex font-size, e.g. \small (default=empty)")
+                        
+    sprintf sdec "%d", dec
+    scalar nc = cols(mprint)
+    scalar nr = rows(mprint)
+    outfile @path --write --quiet
+    printf "\begin{table}[htbp]\n"
+    printf "\centering\n"
+    printf "%s \n", fontsize
+    if note!=""
+        printf "\begin{threeparttable} \n"
+    endif
+    printf "\begin{tabular}{l"
+    loop i=1..nc -q
+        printf "c"
+    endloop
+    printf "}\n"
+    printf "\\toprule\n"
+    # Print column names
+    printf "%s", strsplit(cnames,1)
+    loop i=2..(1+nc) -q
+        printf " & %s", strsplit(cnames,$i)
+    endloop
+    printf "\\\ \hline\n"
+    # Printf Rows
+    loop i=1..nr -q
+        printf "%s", strsplit(rnames,$i)
+        loop j=1..nc -q
+            if isnan(mprint[i,j])
+                printf " & "
+            else
+                printf " & %.@sdecf", mprint[i,j]
+            endif
+        endloop
+        printf "\\\ \n"
+    endloop
+    printf "\bottomrule\n"
+    printf "\end{tabular}\n"
+    if note!=""
+        printf "\begin{tablenotes} \n"
+        printf "\footnotesize \n"
+        printf "\item \\textsc{Note:} @note \n"
+        printf "\end{tablenotes} \n"
+        printf "\end{threeparttable} \n"
+    endif
+    printf "\caption{@capt}\n"
+    printf "\label{@lab}\n"
+    printf "\end{table}\n"
+    outfile --close
+
+    printf "Table written into %s", path
+
+end function
+
+# The following function uses strings S instead of string
+# Also, the \multicolumn Latex-option is recognized is dealt
+# accordingly with
+
+function void latextab2 (matrix mprint,
+      strings S "Row names",
+      strings C "Col names",
+      string capt,
+      string lab,
+      string note,
+      string path "Path for tex-file",
+      int dec[0:6:3] "# of decimal places",
+      string fontsize "Use latex font-size, e.g. \small (default=empty)")
+    sprintf sdec "%d", dec
+    scalar nc = cols(mprint)
+    scalar nr = rows(mprint)
+    outfile @path --write --quiet
+    printf "\begin{table}[htbp]\n"
+    printf "\centering\n"
+    printf "%s \n", fontsize
+    if note!=""
+        printf "\begin{threeparttable} \n"
+    endif
+    printf "\begin{tabular}{l"
+    loop i=1..nc -q
+        printf "c"
+    endloop
+    printf "}\n"
+    printf "\\toprule\n"
+    
+    /* Neglect 4 the moment
+       # Print column names
+       printf "%s", strsplit(cnames,1)
+       loop i=2..(1+nc) -q
+       printf " & %s", strsplit(cnames,$i)
+       endloop
+       printf "\\\ \hline\n"
+    */
+    
+    # Printf Rows
+    loop i=1..nr -q
+        if strncmp("\multicolumn",S[i],13)>0
+            printf "%s", S[i]
+        else
+            printf "%s", S[i]
+            loop j=1..nc -q
+                if isnan(mprint[i,j])
+                    printf " & "
+                else
+                    printf " & %.@sdecf", mprint[i,j]
+                endif
+            endloop
+        endif        
+        printf "\\\ \n"
+    endloop
+    printf "\bottomrule\n"
+    printf "\end{tabular}\n"
+    if note!=""
+        printf "\begin{tablenotes} \n"
+        printf "\footnotesize \n"
+        printf "\item \\textsc{Note:} @note \n"
+        printf "\end{tablenotes} \n"
+        printf "\end{threeparttable} \n"
+    endif
+    printf "\caption{@capt}\n"
+    printf "\label{@lab}\n"
+    printf "\end{table}\n"
+    outfile --close
+end function
+
+
+/*
+#-------------------------
+# Example using latextab2()
+#-------------------------
+set echo off
+set messages off
+#include latextab.gfn
+
+open denmark.gdt -q
+# Compute some stats and add to matrix
+matrix mstat = zeros(3,3)
+list ylist = LRM LRY
+list dylist = diff(ylist)
+loop foreach i dylist -q
+    mstat[i+1,] = min($i)~max($i)~mean($i)
+endloop
+
+# Add some strings
+colnames(mstat, "@cnames")
+strings S = defarray("Variable")
+S+=varnames(dylist)
+#rownames(mstat, S)
+strings C = defarray("Min", "Max", "Mean")
+#colnames(mstat, C)
+mstat = (mstat ? mstat : NA)
+string note = "Add a note"
+sprintf path "%s/ltab2.tex", $workdir		# SET THE PATH
+scalar dec = 3
+string fs = "\small"
+string lab = ""
+# Write tex-file
+latextab2(mstat, S, C, "Descriptive Statistics", "@lab", "@note", "@path", dec, "@fs")
+*/
+
+/*
+#-------------------------
+# Example using latextab()
+#-------------------------
+set echo off
+set messages off
+#include latextab.gfn
+
+open denmark.gdt -q
+# Compute some stats and add to matrix
+matrix mstat = zeros(2,3)
+list ylist = LRM LRY
+list dylist = diff(ylist)
+loop foreach i dylist -q
+    mstat[i,] = min($i)~max($i)~mean($i)
+endloop
+
+# Add some strings
+string cnames = "Variable Min Max Mean"
+colnames(mstat, "@cnames")
+string rnames = strsub(varname(dylist),","," ")
+rnames = strsub(rnames, "_", "\_")
+rownames(mstat, "@rnames")
+string note = "Add a note"
+sprintf path "%s/ltab.tex", $workdir		# SET THE PATH
+scalar dec = 3
+string fs = "\small"
+string lab = ""
+# Write tex-file
+latextab(mstat, cnames, rnames, "Descriptive Statistics", "@lab", "@note", "@path", dec, "@fs")
+*/
