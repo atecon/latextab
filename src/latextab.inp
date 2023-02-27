@@ -63,9 +63,11 @@ function void latextab (matrix mprint,
         printf "\end{table}\n"
     end outfile
 
-    if $error
+    scalar err = $error
+
+    if err
         printf "\nERROR: Failed to write tex-file.\n"
     else
-        printf "\nINFO: Successfully wrote tex-file.\n"
+        printf "\nINFO: Successfully wrote tex-file to '%s'.\n", path
     endif
 end function
