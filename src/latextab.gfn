@@ -5,7 +5,7 @@
 <version>0.3</version>
 <date>2023-02-27</date>
 <description>Write matrix as Latex table</description>
-<tags>C13 C52</tags>
+<tags>C88</tags>
 <help>
 This package writes a gretl matrix as a Latex table.
 
