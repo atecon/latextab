@@ -61,7 +61,7 @@ function void latextab (matrix mprint,
         printf "\caption{@capt}\n"
         printf "\label{@lab}\n"
         printf "\end{table}\n"
-    outfile --close
+    end outfile
 
     if $error
         printf "\nERROR: Failed to write tex-file.\n"
