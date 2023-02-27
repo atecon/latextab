@@ -1,26 +1,29 @@
-set echo off
-set messages off
+clear
+set verbose off
 include latextab.gfn
-
 open denmark.gdt -q
+
 # Compute some stats and add to matrix
-matrix mstat = zeros(2,3)
+matrix mstat = zeros(2, 3)
 list ylist = LRM LRY
 list dylist = diff(ylist)
 loop foreach i dylist -q
-    mstat[i,] = min($i)~max($i)~mean($i)
+    mstat[i,] = min($i) ~ max($i) ~ mean($i)
 endloop
 
-# Add some strings
-string cnames = "Variable Min Max Mean"
-colnames(mstat, "@cnames")
-string rnames = strsub(varname(dylist),","," ")
-rnames = strsub(rnames, "_", "\_")
-rownames(mstat, "@rnames")
+# Specify table strings
+string column_labels = "Variable Min Max Mean"
+cnameset(mstat, "@column_labels")
+string row_labels = strsub(varname(dylist),","," ")
+row_labels = strsub(row_labels, "_", "\_")
+rnameset(mstat, "@row_labels")
 string note = "Add a note"
-sprintf path "%s/ltab.tex", $workdir        # SET THE PATH
+string path  = sprintf("%s/ltab.tex", $workdir)  # SET THE PATH
 scalar dec = 3
 string fs = "\small"
-string lab = ""
-# Write tex-file
-latextab(mstat, cnames, rnames, "Descriptive Statistics", lab, note, path, dec, fs)
+string label = ""
+string caption = "Descriptive Statistics"
+
+# Compile and write the tex-file
+latextab(mstat, column_labels, row_labels, caption, label,
+         note, path, dec, fs)

@@ -13,13 +13,15 @@ function void latextab (matrix mprint,
     scalar nc = cols(mprint)
     scalar nr = rows(mprint)
 
-    outfile "@path" --quiet
+    catch outfile "@path" --quiet
         printf "\begin{table}[htbp]\n"
         printf "\centering\n"
         printf "%s \n", fontsize
+
         if note!=""
             printf "\begin{threeparttable} \n"
         endif
+
         printf "\begin{tabular}{l"
         loop i=1..nc -q
             printf "c"
@@ -44,8 +46,10 @@ function void latextab (matrix mprint,
             endloop
             printf "\\\ \n"
         endloop
+
         printf "\bottomrule\n"
         printf "\end{tabular}\n"
+
         if note!=""
             printf "\begin{tablenotes} \n"
             printf "\footnotesize \n"
@@ -53,8 +57,15 @@ function void latextab (matrix mprint,
             printf "\end{tablenotes} \n"
             printf "\end{threeparttable} \n"
         endif
+
         printf "\caption{@capt}\n"
         printf "\label{@lab}\n"
         printf "\end{table}\n"
     outfile --close
+
+    if $error
+        printf "\nERROR: Failed to write tex-file.\n"
+    else
+        printf "\nINFO: Successfully wrote tex-file.\n"
+    endif
 end function

@@ -9,33 +9,33 @@
 <help>
 This package writes a gretl matrix as a Latex table.
 
-Please report bugs or comments on the gretl mailing list or write to
-atecon@posteo.de.
+Please report bugs or comments on the gretl mailing list, write to
+atecon@posteo.de or report an issue on github (https://github.com/atecon/latextab).
 
 
 Public function
 ===============
 
 latextab()
-----------------------------------------------
+-----------
+Pass a matrix and store this as a Latex table in a tex-file.
 
 Parameters:
 -----------
 mprint   - matrix (r by c)
-cnames   - string, space sep. string of columns
-rnames   - string, space sep. string of rows
+cnames   - string, space separated string holding column labels
+rnames   - string, space separated string holding row labels
 capt     - string, string holding the table caption
 lab      - string, string holding the table label
 note     - string, string holding a note
 path     - string, path+file name to store tex-file
 dec      - int, number of decimal places to print
 fontsize - string, Font-site, Use latex-style, e.g. &quot;\small&quot;,
-           for deault leave empty (&quot;&quot;)
+           for default leave empty (&quot;&quot;)
 
 Returns:
 --------
 Tex file stored at &quot;path&quot;.
-
 
 
 Changelog:
@@ -50,7 +50,7 @@ v0.21 (April 2016)
   - Add font-size option
 v0.2 (Dec. 2015)
   - Add the possibility to determine the number of decimal places
-  - Automatic detection and ignoration of nan-values
+  - Automatic detection NA values (these are ignored)
 </help>
 <gretl-function name="latextab" type="void">
  <params count="9">
@@ -64,90 +64,93 @@ v0.2 (Dec. 2015)
   <param name="capt" type="string"/>
   <param name="lab" type="string"/>
   <param name="note" type="string"/>
-  <param name="path" type="string">
-<description>Path for tex-file</description>
-  </param>
-  <param name="dec" type="int" min="0" max="6" default="3">
-<description># of decimal places</description>
-  </param>
-  <param name="fontsize" type="string">
-<description>Use latex font-size, e.g. \small (default=empty)</description>
-  </param>
+  <param name="path" type="string"/>
+  <param name="dec" type="int" min="0" max="6" default="3"/>
+  <param name="fontsize" type="string"/>
  </params>
-<code>sprintf sdec &quot;%d&quot;, dec
+<code>/* Main function */
+string sdec  = sprintf(&quot;%d&quot;, dec)
 scalar nc = cols(mprint)
 scalar nr = rows(mprint)
-outfile &quot;@path&quot; --write --quiet
-printf &quot;\begin{table}[htbp]\n&quot;
-printf &quot;\centering\n&quot;
-printf &quot;%s \n&quot;, fontsize
-if note!=&quot;&quot;
-  printf &quot;\begin{threeparttable} \n&quot;
-endif
-printf &quot;\begin{tabular}{l&quot;
-loop i=1..nc -q
-  printf &quot;c&quot;
-endloop
-printf &quot;}\n&quot;
-printf &quot;\\toprule\n&quot;
-printf &quot;%s&quot;, strsplit(cnames,1)
-loop i=2..(1+nc) -q
-  printf &quot; &amp; %s&quot;, strsplit(cnames,$i)
-endloop
-printf &quot;\\\ \hline\n&quot;
-loop i=1..nr -q
-  printf &quot;%s&quot;, strsplit(rnames,$i)
-  loop j=1..nc -q
-    if isnan(mprint[i,j])
-      printf &quot; &amp; &quot;
-    else
-      printf &quot; &amp; %.@sdecf&quot;, mprint[i,j]
-    endif
+catch outfile &quot;@path&quot; --quiet
+  printf &quot;\begin{table}[htbp]\n&quot;
+  printf &quot;\centering\n&quot;
+  printf &quot;%s \n&quot;, fontsize
+  if note!=&quot;&quot;
+    printf &quot;\begin{threeparttable} \n&quot;
+  endif
+  printf &quot;\begin{tabular}{l&quot;
+  loop i=1..nc -q
+    printf &quot;c&quot;
   endloop
-  printf &quot;\\\ \n&quot;
-endloop
-printf &quot;\bottomrule\n&quot;
-printf &quot;\end{tabular}\n&quot;
-if note!=&quot;&quot;
-  printf &quot;\begin{tablenotes} \n&quot;
-  printf &quot;\footnotesize \n&quot;
-  printf &quot;\item \\textsc{Note:} @note \n&quot;
-  printf &quot;\end{tablenotes} \n&quot;
-  printf &quot;\end{threeparttable} \n&quot;
-endif
-printf &quot;\caption{@capt}\n&quot;
-printf &quot;\label{@lab}\n&quot;
-printf &quot;\end{table}\n&quot;
-outfile --close
+  printf &quot;}\n&quot;
+  printf &quot;\\toprule\n&quot;
+  printf &quot;%s&quot;, strsplit(cnames,1)
+  loop i=2..(1+nc) -q
+    printf &quot; &amp; %s&quot;, strsplit(cnames,$i)
+  endloop
+  printf &quot;\\\ \hline\n&quot;
+  loop i=1..nr -q
+    printf &quot;%s&quot;, strsplit(rnames,$i)
+    loop j=1..nc -q
+      if isnan(mprint[i,j])
+        printf &quot; &amp; &quot;
+      else
+        printf &quot; &amp; %.@sdecf&quot;, mprint[i,j]
+      endif
+    endloop
+    printf &quot;\\\ \n&quot;
+  endloop
+  printf &quot;\bottomrule\n&quot;
+  printf &quot;\end{tabular}\n&quot;
+  if note!=&quot;&quot;
+    printf &quot;\begin{tablenotes} \n&quot;
+    printf &quot;\footnotesize \n&quot;
+    printf &quot;\item \\textsc{Note:} @note \n&quot;
+    printf &quot;\end{tablenotes} \n&quot;
+    printf &quot;\end{threeparttable} \n&quot;
+  endif
+  printf &quot;\caption{@capt}\n&quot;
+  printf &quot;\label{@lab}\n&quot;
+  printf &quot;\end{table}\n&quot;
+  outfile --close
+  if $error
+    printf &quot;\nERROR: Failed to write tex-file.\n&quot;
+  else
+    printf &quot;\nINFO: Successfully wrote tex-file.\n&quot;
+  endif
 </code>
 </gretl-function>
 <sample-script>
-set echo off
-set messages off
+clear
+set verbose off
 include latextab.gfn
-
 open denmark.gdt -q
+
 # Compute some stats and add to matrix
-matrix mstat = zeros(2,3)
+matrix mstat = zeros(2, 3)
 list ylist = LRM LRY
 list dylist = diff(ylist)
 loop foreach i dylist -q
-    mstat[i,] = min($i)~max($i)~mean($i)
+    mstat[i,] = min($i) ~ max($i) ~ mean($i)
 endloop
 
-# Add some strings
-string cnames = &quot;Variable Min Max Mean&quot;
-colnames(mstat, &quot;@cnames&quot;)
-string rnames = strsub(varname(dylist),&quot;,&quot;,&quot; &quot;)
-rnames = strsub(rnames, &quot;_&quot;, &quot;\_&quot;)
-rownames(mstat, &quot;@rnames&quot;)
+# Specify table strings
+string column_labels = &quot;Variable Min Max Mean&quot;
+cnameset(mstat, &quot;@column_labels&quot;)
+string row_labels = strsub(varname(dylist),&quot;,&quot;,&quot; &quot;)
+row_labels = strsub(row_labels, &quot;_&quot;, &quot;\_&quot;)
+rnameset(mstat, &quot;@row_labels&quot;)
 string note = &quot;Add a note&quot;
-sprintf path &quot;%s/ltab.tex&quot;, $workdir        # SET THE PATH
+string path  = sprintf(&quot;%s/ltab.tex&quot;, $workdir)  # SET THE PATH
 scalar dec = 3
 string fs = &quot;\small&quot;
-string lab = &quot;&quot;
-# Write tex-file
-latextab(mstat, cnames, rnames, &quot;Descriptive Statistics&quot;, lab, note, path, dec, fs)
+string label = &quot;&quot;
+string caption = &quot;Descriptive Statistics&quot;
+
+# Compile and write the tex-file
+latextab(mstat, column_labels, row_labels, caption, label,
+         note, path, dec, fs)
 </sample-script>
 </gretl-function-package>
 </gretl-functions>
