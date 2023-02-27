@@ -1,32 +1,32 @@
 This package writes a gretl matrix as a Latex table.
 
-Please report bugs or comments on the gretl mailing list or write to
-atecon@posteo.de.
+Please report bugs or comments on the gretl mailing list, write to
+atecon@posteo.de or report an issue on github (https://github.com/atecon/latextab).
 
 
 Public function
 ===============
 
 latextab()
-----------------------------------------------
+-----------
+Pass a matrix and store this as a Latex table in a tex-file.
 
 Parameters:
 -----------
 mprint   - matrix (r by c)
-cnames   - string, space sep. string of columns
-rnames   - string, space sep. string of rows
+cnames   - string, space separated string holding column labels
+rnames   - string, space separated string holding row labels
 capt     - string, string holding the table caption
 lab      - string, string holding the table label
 note     - string, string holding a note
 path     - string, path+file name to store tex-file
 dec      - int, number of decimal places to print
 fontsize - string, Font-site, Use latex-style, e.g. "\small",
-           for deault leave empty ("")
+           for default leave empty ("")
 
 Returns:
 --------
 Tex file stored at "path".
-
 
 
 Changelog:
@@ -41,5 +41,5 @@ v0.21 (April 2016)
   - Add font-size option
 v0.2 (Dec. 2015)
   - Add the possibility to determine the number of decimal places
-  - Automatic detection and ignoration of nan-values
+  - Automatic detection NA values (these are ignored)
 
