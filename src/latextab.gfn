@@ -10,8 +10,12 @@
 This package writes a gretl matrix as a Latex table.
 
 Please report bugs or comments on the gretl mailing list, write to
-atecon@posteo.de or report an issue on github (https://github.com/atecon/latextab).
+atecon@posteo.de or report an issue on github
+(https://github.com/atecon/latextab).
 
+You may also want to check out the mat2latex() function for the &quot;extra&quot; addon
+which produces a string containing the representation of a matrix as a Latex
+tabular environment.
 
 Public function
 ===============
@@ -113,12 +117,12 @@ catch outfile &quot;@path&quot; --quiet
   printf &quot;\caption{@capt}\n&quot;
   printf &quot;\label{@lab}\n&quot;
   printf &quot;\end{table}\n&quot;
-  outfile --close
-  if $error
-    printf &quot;\nERROR: Failed to write tex-file.\n&quot;
-  else
-    printf &quot;\nINFO: Successfully wrote tex-file.\n&quot;
-  endif
+end outfile
+if $error
+  printf &quot;\nERROR: Failed to write tex-file.\n&quot;
+else
+  printf &quot;\nINFO: Successfully wrote tex-file.\n&quot;
+endif
 </code>
 </gretl-function>
 <sample-script>

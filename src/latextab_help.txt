@@ -1,8 +1,12 @@
 This package writes a gretl matrix as a Latex table.
 
 Please report bugs or comments on the gretl mailing list, write to
-atecon@posteo.de or report an issue on github (https://github.com/atecon/latextab).
+atecon@posteo.de or report an issue on github
+(https://github.com/atecon/latextab).
 
+You may also want to check out the mat2latex() function for the "extra" addon
+which produces a string containing the representation of a matrix as a Latex
+tabular environment.
 
 Public function
 ===============
@@ -42,4 +46,3 @@ v0.21 (April 2016)
 v0.2 (Dec. 2015)
   - Add the possibility to determine the number of decimal places
   - Automatic detection NA values (these are ignored)
-
