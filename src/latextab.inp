@@ -4,54 +4,57 @@ function void latextab (matrix mprint,
                         string capt,
                         string lab,
                         string note,
-                        string path "Path for tex-file",
-                        int dec[0:6:3] "# of decimal places",
-                        string fontsize "Use latex font-size, e.g. \small (default=empty)")
-    sprintf sdec "%d", dec
+                        string path,
+                        int dec[0:6:3],
+                        string fontsize)
+    /* Main function */
+
+    string sdec  = sprintf("%d", dec)
     scalar nc = cols(mprint)
     scalar nr = rows(mprint)
-    outfile "@path" --write --quiet
-    printf "\begin{table}[htbp]\n"
-    printf "\centering\n"
-    printf "%s \n", fontsize
-    if note!=""
-        printf "\begin{threeparttable} \n"
-    endif
-    printf "\begin{tabular}{l"
-    loop i=1..nc -q
-        printf "c"
-    endloop
-    printf "}\n"
-    printf "\\toprule\n"
 
-    printf "%s", strsplit(cnames,1)
-    loop i=2..(1+nc) -q
-        printf " & %s", strsplit(cnames,$i)
-    endloop
-    printf "\\\ \hline\n"
-
-    loop i=1..nr -q
-        printf "%s", strsplit(rnames,$i)
-        loop j=1..nc -q
-            if isnan(mprint[i,j])
-                printf " & "
-            else
-                printf " & %.@sdecf", mprint[i,j]
-            endif
+    outfile "@path" --quiet
+        printf "\begin{table}[htbp]\n"
+        printf "\centering\n"
+        printf "%s \n", fontsize
+        if note!=""
+            printf "\begin{threeparttable} \n"
+        endif
+        printf "\begin{tabular}{l"
+        loop i=1..nc -q
+            printf "c"
         endloop
-        printf "\\\ \n"
-    endloop
-    printf "\bottomrule\n"
-    printf "\end{tabular}\n"
-    if note!=""
-        printf "\begin{tablenotes} \n"
-        printf "\footnotesize \n"
-        printf "\item \\textsc{Note:} @note \n"
-        printf "\end{tablenotes} \n"
-        printf "\end{threeparttable} \n"
-    endif
-    printf "\caption{@capt}\n"
-    printf "\label{@lab}\n"
-    printf "\end{table}\n"
+        printf "}\n"
+        printf "\\toprule\n"
+
+        printf "%s", strsplit(cnames,1)
+        loop i=2..(1+nc) -q
+            printf " & %s", strsplit(cnames,$i)
+        endloop
+        printf "\\\ \hline\n"
+
+        loop i=1..nr -q
+            printf "%s", strsplit(rnames,$i)
+            loop j=1..nc -q
+                if isnan(mprint[i,j])
+                    printf " & "
+                else
+                    printf " & %.@sdecf", mprint[i,j]
+                endif
+            endloop
+            printf "\\\ \n"
+        endloop
+        printf "\bottomrule\n"
+        printf "\end{tabular}\n"
+        if note!=""
+            printf "\begin{tablenotes} \n"
+            printf "\footnotesize \n"
+            printf "\item \\textsc{Note:} @note \n"
+            printf "\end{tablenotes} \n"
+            printf "\end{threeparttable} \n"
+        endif
+        printf "\caption{@capt}\n"
+        printf "\label{@lab}\n"
+        printf "\end{table}\n"
     outfile --close
 end function
