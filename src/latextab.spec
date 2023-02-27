@@ -8,3 +8,4 @@ min-version = 2021a
 public = latextab
 help = latextab_help.txt
 sample-script = latextab_sample.inp
+data-requirement = no-data-ok
