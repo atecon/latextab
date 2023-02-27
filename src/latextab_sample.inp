@@ -7,15 +7,14 @@ open denmark.gdt -q
 matrix mstat = zeros(2, 3)
 list ylist = LRM LRY
 list dylist = diff(ylist)
-loop foreach i dylist -q
+loop foreach i dylist
     mstat[i,] = min($i) ~ max($i) ~ mean($i)
 endloop
 
 # Specify table strings
 string column_labels = "Variable Min Max Mean"
 cnameset(mstat, "@column_labels")
-string row_labels = strsub(varname(dylist),","," ")
-row_labels = strsub(row_labels, "_", "\_")
+string row_labels = "LRM LRY"
 rnameset(mstat, "@row_labels")
 string note = "Add a note"
 string path  = sprintf("%s/ltab.tex", $workdir)  # SET THE PATH

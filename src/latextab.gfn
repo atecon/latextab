@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gretl-functions>
-<gretl-function-package name="latextab" minver="2021a">
+<gretl-function-package name="latextab" no-data-ok="true" minver="2021a">
 <author email="atecon@posteo.de">Artur Tarassow</author>
 <version>0.3</version>
 <date>2023-02-27</date>
 <description>Write matrix as Latex table</description>
 <tags>C88</tags>
 <help>
-This package writes a gretl matrix as a Latex table.
+This package creates Latex code representing a gretl matrix as a Latex table. The returned tex-file is only a snippet which can be included into an existing Latex document.
+
+In order to work, you need to load the &quot;threeparttable&quot; package when compiling your Latex document by means of:
+&quot;\usepackage{threeparttable}&quot;
 
 Please report bugs or comments on the gretl mailing list, write to
 atecon@posteo.de or report an issue on github
 (https://github.com/atecon/latextab).
 
-You may also want to check out the mat2latex() function for the &quot;extra&quot; addon
+You may also want to check out the mat2latex() function from the &quot;extra&quot; addon
 which produces a string containing the representation of a matrix as a Latex
 tabular environment.
 
@@ -34,12 +37,12 @@ lab      - string, string holding the table label
 note     - string, string holding a note
 path     - string, path+file name to store tex-file
 dec      - int, number of decimal places to print
-fontsize - string, Font-site, Use latex-style, e.g. &quot;\small&quot;,
+fontsize - string, Font size, Use latex-style, e.g. &quot;\small&quot;,
            for default leave empty (&quot;&quot;)
 
 Returns:
 --------
-Tex file stored at &quot;path&quot;.
+Nothing. Instead, a tex file is stored at the given &quot;path&quot;.
 
 
 Changelog:
@@ -55,6 +58,12 @@ v0.21 (April 2016)
 v0.2 (Dec. 2015)
   - Add the possibility to determine the number of decimal places
   - Automatic detection NA values (these are ignored)
+
+
+TODO:
+=====
++ Spit out a working self-contained Tex file, either as the string return value or whatever.
++ Improve and simplify the user-interface (make of use of a bundle replacing the numerous variables being required to pass)
 </help>
 <gretl-function name="latextab" type="void">
  <params count="9">
@@ -118,10 +127,11 @@ catch outfile &quot;@path&quot; --quiet
   printf &quot;\label{@lab}\n&quot;
   printf &quot;\end{table}\n&quot;
 end outfile
-if $error
+scalar err = $error
+if err
   printf &quot;\nERROR: Failed to write tex-file.\n&quot;
 else
-  printf &quot;\nINFO: Successfully wrote tex-file.\n&quot;
+  printf &quot;\nINFO: Successfully wrote tex-file to '%s'.\n&quot;, path
 endif
 </code>
 </gretl-function>
@@ -135,15 +145,14 @@ open denmark.gdt -q
 matrix mstat = zeros(2, 3)
 list ylist = LRM LRY
 list dylist = diff(ylist)
-loop foreach i dylist -q
+loop foreach i dylist
     mstat[i,] = min($i) ~ max($i) ~ mean($i)
 endloop
 
 # Specify table strings
 string column_labels = &quot;Variable Min Max Mean&quot;
 cnameset(mstat, &quot;@column_labels&quot;)
-string row_labels = strsub(varname(dylist),&quot;,&quot;,&quot; &quot;)
-row_labels = strsub(row_labels, &quot;_&quot;, &quot;\_&quot;)
+string row_labels = &quot;LRM LRY&quot;
 rnameset(mstat, &quot;@row_labels&quot;)
 string note = &quot;Add a note&quot;
 string path  = sprintf(&quot;%s/ltab.tex&quot;, $workdir)  # SET THE PATH
