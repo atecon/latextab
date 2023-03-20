@@ -7,71 +7,7 @@
 <description>Write matrix as Latex table</description>
 <tags>C88</tags>
 <help>
-This package creates Latex code representing a gretl matrix as a Latex table.
-Per default, the returned tex-file is only a snippet which can be included into 
-an existing Latex document. Optionally, the tex file can be stored as a 
-separate Tex document which can be compiled.
 
-In order to work, you need to load the &quot;threeparttable&quot; package when compiling
-your Latex document by means of:
-&quot;\usepackage{threeparttable}&quot;
-
-Please report bugs or comments on the gretl mailing list, write to
-atecon@posteo.de or report an issue on github
-(https://github.com/atecon/latextab).
-
-You may also want to check out the mat2latex() function from the &quot;extra&quot; addon
-which produces a string containing the representation of a matrix as a Latex
-tabular environment.
-
-Public function
-===============
-
-latextab()
------------
-Pass a matrix and store this as a Latex table in a tex-file.
-
-Parameters:
------------
-mprint   - matrix (r by c)
-cnames   - string, space separated string holding column labels
-rnames   - string, space separated string holding row labels
-capt     - string, string holding the table caption
-lab      - string, string holding the table label
-note     - string, string holding a note
-path     - string, path+file name to store tex-file
-dec      - int, number of decimal places to print
-fontsize - string, Font size, Use latex-style, e.g. &quot;\small&quot;,
-           for default leave empty (&quot;&quot;)
-todoc    - bool, Switch to add the document headers such that the tex-file can
-           be compiled if set to TRUE (=1) (optional, FALSE (=0) per default)
-Returns:
---------
-Nothing. Instead, a tex file is stored at the given &quot;path&quot;.
-
-
-Changelog:
-==========
-v0.3 (February 2023)
-  - Update help text
-  - Add new switch &quot;todoc&quot;
-  - Fix typos
-v0.22 (May 2017)
-  - changed ''outfile @path --write --quiet'' to
-    ''outfile &quot;@path&quot; --write --quiet'' to allow for white-spaces in path
-v0.21 (April 2016)
-  - Add font-size option
-v0.2 (Dec. 2015)
-  - Add the possibility to determine the number of decimal places
-  - Automatic detection NA values (these are ignored)
-
-
-TODO:
-=====
-+ Spit out a working self-contained Tex file, either as the string return
-  value or whatever.
-+ Improve and simplify the user-interface (make of use of a bundle replacing
-  the numerous variables being required to pass)
 </help>
 <gretl-function name="latextab" type="void">
  <params count="10">
@@ -108,21 +44,21 @@ catch outfile &quot;@path&quot; --quiet
   endif
 
   printf &quot;\begin{tabular}{l&quot;
-  loop i=1..nc -q
+  loop i=1..nc
     printf &quot;c&quot;
   endloop
   printf &quot;}\n&quot;
   printf &quot;\\toprule\n&quot;
 
   printf &quot;%s&quot;, strsplit(cnames,1)
-  loop i=2..(1+nc) -q
+  loop i=2..(1+nc)
     printf &quot; &amp; %s&quot;, strsplit(cnames,$i)
   endloop
   printf &quot;\\\ \hline\n&quot;
 
-  loop i=1..nr -q
+  loop i=1..nr
     printf &quot;%s&quot;, strsplit(rnames,$i)
-    loop j=1..nc -q
+    loop j=1..nc
       if isnan(mprint[i,j])
         printf &quot; &amp; &quot;
       else

@@ -26,21 +26,21 @@ function void latextab (const matrix mprint,
         endif
 
         printf "\begin{tabular}{l"
-        loop i=1..nc -q
+        loop i=1..nc
             printf "c"
         endloop
         printf "}\n"
         printf "\\toprule\n"
 
         printf "%s", strsplit(cnames,1)
-        loop i=2..(1+nc) -q
+        loop i=2..(1+nc)
             printf " & %s", strsplit(cnames,$i)
         endloop
         printf "\\\ \hline\n"
 
-        loop i=1..nr -q
+        loop i=1..nr
             printf "%s", strsplit(rnames,$i)
-            loop j=1..nc -q
+            loop j=1..nc
                 if isnan(mprint[i,j])
                     printf " & "
                 else
