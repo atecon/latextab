@@ -32,6 +32,8 @@ string sdec  = sprintf(&quot;%d&quot;, dec)
 scalar nc = cols(mprint)
 scalar nr = rows(mprint)
 
+set force_decpoint on
+
 catch outfile &quot;@path&quot; --quiet
   print_document_head(todoc)
 
@@ -93,6 +95,8 @@ if err
 else
   printf &quot;\nINFO: Successfully wrote tex-file to '%s'.\n&quot;, path
 endif
+
+set force_decpoint off
 </code>
 </gretl-function>
 <gretl-function name="print_document_head" type="void" private="1">
