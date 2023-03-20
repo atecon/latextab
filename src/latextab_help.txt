@@ -1,6 +1,7 @@
 This package creates Latex code representing a gretl matrix as a Latex table.
-The returned tex-file is only a snippet which can be included into an existing
-Latex document.
+Per default, the returned tex-file is only a snippet which can be included into
+an existing Latex document. Optionally, the tex file can be stored as a
+separate Tex document which can be compiled.
 
 In order to work, you need to load the "threeparttable" package when compiling
 your Latex document by means of:
@@ -33,7 +34,8 @@ path     - string, path+file name to store tex-file
 dec      - int, number of decimal places to print
 fontsize - string, Font size, Use latex-style, e.g. "\small",
            for default leave empty ("")
-
+todoc    - bool, Switch to add the document headers such that the tex-file can
+           be compiled if set to TRUE (=1) (optional, FALSE (=0) per default)
 Returns:
 --------
 Nothing. Instead, a tex file is stored at the given "path".
@@ -43,6 +45,7 @@ Changelog:
 ==========
 v0.3 (February 2023)
   - Update help text
+  - Add new switch "todoc"
   - Fix typos
 v0.22 (May 2017)
   - changed ''outfile @path --write --quiet'' to

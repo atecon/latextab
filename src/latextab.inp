@@ -1,12 +1,13 @@
-function void latextab (matrix mprint,
-                        string cnames "Space sep. string of columns",
-                        string rnames "Space sep. string of rows",
-                        string capt,
-                        string lab,
-                        string note,
-                        string path,
-                        int dec[0:6:3],
-                        string fontsize)
+function void latextab (const matrix mprint,
+                        const string cnames "Space sep. string of columns",
+                        const string rnames "Space sep. string of rows",
+                        const string capt,
+                        const string lab,
+                        const string note,
+                        const string path,
+                        const int dec[0:6:3],
+                        const string fontsize,
+                        const bool todoc[FALSE])
     /* Main function */
 
     string sdec  = sprintf("%d", dec)
@@ -14,6 +15,8 @@ function void latextab (matrix mprint,
     scalar nr = rows(mprint)
 
     catch outfile "@path" --quiet
+        print_document_head(todoc)
+
         printf "\begin{table}[htbp]\n"
         printf "\centering\n"
         printf "%s \n", fontsize
@@ -61,6 +64,8 @@ function void latextab (matrix mprint,
         printf "\caption{@capt}\n"
         printf "\label{@lab}\n"
         printf "\end{table}\n"
+
+        print_document_end(todoc)
     end outfile
 
     scalar err = $error
@@ -71,3 +76,22 @@ function void latextab (matrix mprint,
         printf "\nINFO: Successfully wrote tex-file to '%s'.\n", path
     endif
 end function
+
+
+function void print_document_head (const bool todoc)
+    if todoc == TRUE
+        print "\documentclass{article}"
+        print "\usepackage{booktabs}"
+        print "\usepackage{threeparttable}"
+
+        print "\begin{document}"
+    endif
+end function
+
+
+function void print_document_end (const bool todoc)
+    if todoc == TRUE
+        print "\end{document}"
+    endif
+end function
+
