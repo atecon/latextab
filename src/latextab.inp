@@ -14,6 +14,8 @@ function void latextab (const matrix mprint,
     scalar nc = cols(mprint)
     scalar nr = rows(mprint)
 
+    set force_decpoint on
+
     catch outfile "@path" --quiet
         print_document_head(todoc)
 
@@ -75,6 +77,8 @@ function void latextab (const matrix mprint,
     else
         printf "\nINFO: Successfully wrote tex-file to '%s'.\n", path
     endif
+
+    set force_decpoint off
 end function
 
 
