@@ -59,7 +59,5 @@ v0.2 (Dec. 2015)
 
 TODO:
 =====
-+ Spit out a working self-contained Tex file, either as the string return
-  value or whatever.
 + Improve and simplify the user-interface (make of use of a bundle replacing
   the numerous variables being required to pass)
