@@ -1,64 +1,140 @@
-function void latextab (const matrix mprint,
-                        const string cnames "Space sep. string of columns",
-                        const string rnames "Space sep. string of rows",
-                        const string capt,
-                        const string lab,
-                        const string note,
-                        const string path,
-                        const int dec[0:6:3],
-                        const string fontsize,
-                        const bool todoc[FALSE])
-    /* Main function */
 
-    string sdec  = sprintf("%d", dec)
-    scalar nc = cols(mprint)
-    scalar nr = rows(mprint)
+function bundle default_values (void)
+    /* Set default values */
+
+    bundle self = null
+    strings self.clabels = array(0)
+    strings self.rlabels = array(0)
+    string self.caption = ""
+    string self.label = ""
+    string self.note = ""
+    string self.filename = ""
+    string self.fontsize = ""
+    scalar self.todoc = TRUE
+
+    return self
+end function
+
+
+function void latextab (const matrix mat,
+                        const bundle params)
+
+    /* Main function */
 
     set force_decpoint on
 
-    catch outfile "@path" --quiet
-        print_document_head(todoc)
+    bundle self = default_values()
+    if exists(params)
+        self = params + self         # override defaults
+    endif
+    if !inbundle(self, digits)
+        # fix number of digits for each columns
+        matrix self.digits = 3 * ones(cols(mat))
+    endif
+
+    errorif(nelem(self.rlabels) != rows(mat),
+            "Number of rows must equal number of row labels. Abort.")
+
+    if nelem(self.rlabels)
+        errorif(cols(mat) != 1 + nelem(self.clabels),
+                sprintf("You must add a column label for the first descriptive column as you also passed row labels. Abort."))
+    endif
+
+    errorif(nelem(self.clabels) != cols(mat),
+            "Number of columns must equal number of column labels. Abort.")
+
+    write_table(mat, self)
+
+    set force_decpoint off
+end function
+
+
+function void write_column_allignment (const bundle self)
+    /* Write alignment of columns. Currently all columns are centred except
+      the first one which is left-sided. */
+
+    printf "\begin{tabular}{l"
+    loop i=2..nelem(self.clabels)
+        printf "c"
+    endloop
+    printf "}\n"
+end function
+
+
+function void write_column_labels (const bundle self)
+    /* Write column labels */
+
+    loop i=1..nelem(self.clabels)
+        printf "%s", self.clabels[i]
+        if i < nelem(self.clabels)
+            printf " & "
+        else
+            printf "\n"
+        endif
+    endloop
+end function
+
+
+function void write_values (const matrix mat, const bundle self)
+    /* Write (eventual) row labels and actual values. */
+
+    scalar with_rowlabels = (inbundle(self, "rlabels") && \
+                             nelem(self.rlabels)) ? TRUE : FALSE
+
+    loop i=1..rows(mat)
+        if with_rowlabels
+            printf "%s & ", self.rlabels[i]
+        endif
+
+        loop j=1..cols(mat)
+            if !ok(mat[i,j])
+                printf " & "
+            else
+                string dec = sprintf("%d", self.digits[j])
+                printf "%.@decf", mat[i,j]
+                if j < cols(mat)
+                    printf " & "
+                endif
+            endif
+        endloop
+        printf " \\\ \n"
+    endloop
+end function
+
+
+
+function scalar write_table (const matrix mat, const bundle self)
+    /* Actual writing happens here.
+       return: int, Error code is zero (=FALSE) if not error occurs, otherwise
+       TRUE */
+
+    string filename = self.filename
+
+    catch outfile "@filename" --quiet
+        print_document_head(self.todoc)
 
         printf "\begin{table}[htbp]\n"
         printf "\centering\n"
-        printf "%s \n", fontsize
+        printf "%s \n", self.fontsize
 
-        if note!=""
+        if nelem(self.note)
             printf "\begin{threeparttable} \n"
         endif
 
-        printf "\begin{tabular}{l"
-        loop i=1..nc
-            printf "c"
-        endloop
-        printf "}\n"
+        write_column_allignment(self)
         printf "\\toprule\n"
-
-        printf "%s", strsplit(cnames,1)
-        loop i=2..(1+nc)
-            printf " & %s", strsplit(cnames,$i)
-        endloop
+        write_column_labels(self)
         printf "\\\ \hline\n"
 
-        loop i=1..nr
-            printf "%s", strsplit(rnames,$i)
-            loop j=1..nc
-                if isnan(mprint[i,j])
-                    printf " & "
-                else
-                    printf " & %.@sdecf", mprint[i,j]
-                endif
-            endloop
-            printf "\\\ \n"
-        endloop
+        write_values(mat, self)
 
         printf "\bottomrule\n"
         printf "\end{tabular}\n"
 
-        if note!=""
+        if nelem(self.note)
             printf "\begin{tablenotes} \n"
             printf "\footnotesize \n"
-            printf "\item \\textsc{Note:} @note \n"
+            printf "\item \\textsc{Note:} %s \n", self.note
             printf "\end{tablenotes} \n"
             printf "\end{threeparttable} \n"
         endif
@@ -74,11 +150,9 @@ function void latextab (const matrix mprint,
 
     if err
         printf "\nERROR: Failed to write tex-file.\n"
-    else
-        printf "\nINFO: Successfully wrote tex-file to '%s'.\n", path
     endif
 
-    set force_decpoint off
+    return err
 end function
 
 

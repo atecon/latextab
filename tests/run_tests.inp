@@ -1,0 +1,98 @@
+set verbose off
+clear
+
+include assertion.gfn
+set assert stop
+
+include "./src/latextab.inp" --force
+# include string_utils.gfn
+
+
+function void test_write_column_allignment (void)
+    print "Start testing function write_column_allignment()"
+
+    # Given
+    bundle self = _(clabels = defarray("A", "B"))
+    string actual
+
+    # When
+    string expected = sprintf("\begin{tabular}{lc}\n")
+
+    outfile --buffer=actual
+        write_column_allignment(self)
+    end outfile
+
+    # Then
+    assert(actual == expected)
+end function
+test_write_column_allignment()
+
+
+function void test_write_column_labels (void)
+    print "Start testing function write_column_labels()"
+
+    # Given
+    bundle self = _(clabels = defarray("A", "B"))
+    string actual
+
+    # When
+    string expected = sprintf("A & B\n")
+
+    outfile --buffer=actual
+        write_column_labels(self)
+    end outfile
+
+    # Then
+    print actual expected
+    assert(actual == expected)
+end function
+test_write_column_labels()
+
+
+function void test_write_column_labels_no (void)
+    print "Start testing function write_column_labels() with no clabels passed"
+
+    # Given
+    bundle self
+    strings self.clabels = array(0)
+    string actual
+
+    # When
+    string expected = ""
+
+    outfile --buffer=actual
+        write_column_labels(self)
+    end outfile
+
+    # Then
+    print actual expected
+    assert(actual == expected)
+end function
+test_write_column_labels_no()
+
+
+function void test_write_values_no_rlabels (void)
+    print "Start testing function write_values() without row labels"
+
+    # Given
+    matrix mat = {1, 2; 3, 4; 5, 6}
+    bundle self = _(digits = 3 * ones(cols(mat), 1))
+    string actual
+
+    # When
+    string expected = sprintf("1.000 & 2.000 \\\ \n3.000 & 4.000 \\\ \n5.000 & 6.000 \\\ \n")
+    outfile --buffer=actual
+        write_values(mat, self)
+    end outfile
+
+    # Then
+    assert(expected == actual)
+end function
+test_write_values_no_rlabels()
+
+
+**Teste write_table()**
+
+
+print "Successfully passed all tests."
+quit
