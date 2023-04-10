@@ -1,4 +1,3 @@
-
 function bundle default_values (void)
     /* Set default values */
 
@@ -10,51 +9,113 @@ function bundle default_values (void)
     string self.note = ""
     string self.filename = ""
     string self.fontsize = ""
-    scalar self.todoc = TRUE
+    scalar self.todoc = FALSE
+    scalar self.bold_rlabels = FALSE
+    scalar self.bold_clabels = TRUE
+    scalar self.enforce_decpoint = TRUE
+    string self.position = "htbp"
 
     return self
 end function
 
 
-function void latextab (const matrix mat,
-                        const bundle params)
+function void add_digits_vector (bundle *self)
+    /* Define number of digits for each column. */
 
-    /* Main function */
+    if !inbundle(self, digits)
+        matrix self.digits = 3 * ones(self.ncols)
+    endif
+end function
 
-    set force_decpoint on
+function void add_clabels (const matrix mat, bundle *self)
+    /* Retrieve eventual column labels from matrix and add to self if
+     the user has not passed any labels, yet. */
+
+    strings clabels = cnameget(mat)
+    if nelem(clabels) && !nelem(self.clabels)
+        if nelem(self.rlabels)
+            self.clabels += "Description"  # default column name
+        endif
+        self.clabels += clabels
+    endif
+end function
+
+function void add_rlabels (const matrix mat, bundle *self)
+    /* Retrieve eventual row labels from matrix and add to self. */
+
+    strings rlabels = rnameget(mat)
+    if nelem(rlabels)
+        self.rlabels = rlabels
+    endif
+end function
+
+
+function string latextab (const matrix mat,
+                          const bundle params[null])
+    /* Main function.
+    returns: A string holding the tex-code. */
 
     bundle self = default_values()
     if exists(params)
         self = params + self         # override defaults
     endif
-    if !inbundle(self, digits)
-        # fix number of digits for each columns
-        matrix self.digits = 3 * ones(cols(mat))
-    endif
+    self.ncols = cols(mat)
+    self.nrows = rows(mat)
+    add_rlabels(mat, &self)
+    add_clabels(mat, &self)
 
-    errorif(nelem(self.rlabels) != rows(mat),
+    errorif(nelem(self.rlabels) != self.nrows,
             "Number of rows must equal number of row labels. Abort.")
 
     if nelem(self.rlabels)
-        errorif(cols(mat) != 1 + nelem(self.clabels),
-                sprintf("You must add a column label for the first descriptive column as you also passed row labels. Abort."))
+        errorif((self.ncols + 1) != nelem(self.clabels),
+                sprintf("You must add a column label for the first descriptive column as the matrix has row labels. Abort."))
     endif
 
-    errorif(nelem(self.clabels) != cols(mat),
-            "Number of columns must equal number of column labels. Abort.")
+    add_digits_vector(&self)
 
-    write_table(mat, self)
+    errorif(nelem(self.digits) != self.ncols,
+            "Length of vector 'digits' must equal number of columns. Abort.")
 
-    set force_decpoint off
+
+    if self.enforce_decpoint
+        set force_decpoint on
+    endif
+
+    string texcode = compile_texcode(mat, self)
+
+    if self.enforce_decpoint
+        set force_decpoint off
+    endif
+
+    if nelem(self.filename)
+        write_file(texcode, self.filename)
+    endif
+
+    return texcode
+end function
+
+
+function void write_file (const string texcode, const string filename)
+    /* Actuall writing of tex-code. */
+
+    outfile "@filename"
+        printf "%s", texcode
+    end outfile
 end function
 
 
 function void write_column_allignment (const bundle self)
     /* Write alignment of columns. Currently all columns are centred except
-      the first one which is left-sided. */
+      the first one, if row labels are given, which is left-sided as it refers
+      to some description column. */
 
-    printf "\begin{tabular}{l"
-    loop i=2..nelem(self.clabels)
+    printf "\begin{tabular}{"
+    if inbundle(self, "rlabels") && nelem(self.rlabels)
+        printf "l"
+    endif
+
+    loop i=1..self.ncols
         printf "c"
     endloop
     printf "}\n"
@@ -65,7 +126,12 @@ function void write_column_labels (const bundle self)
     /* Write column labels */
 
     loop i=1..nelem(self.clabels)
-        printf "%s", self.clabels[i]
+        if self.bold_clabels
+            printf "\\textbf{%s}", self.clabels[i]
+        else
+            printf "%s", self.clabels[i]
+        endif
+
         if i < nelem(self.clabels)
             printf " & "
         else
@@ -83,7 +149,11 @@ function void write_values (const matrix mat, const bundle self)
 
     loop i=1..rows(mat)
         if with_rowlabels
-            printf "%s & ", self.rlabels[i]
+            if self.bold_rlabels
+                printf "\\textbf{%s} & ", self.rlabels[i]
+            else
+                printf "%s & ", self.rlabels[i]
+            endif
         endif
 
         loop j=1..cols(mat)
@@ -102,18 +172,30 @@ function void write_values (const matrix mat, const bundle self)
 end function
 
 
+function void write_note (const bundle self)
+    /* Write block for a note. */
 
-function scalar write_table (const matrix mat, const bundle self)
-    /* Actual writing happens here.
-       return: int, Error code is zero (=FALSE) if not error occurs, otherwise
-       TRUE */
+    if nelem(self.note)
+        printf "\begin{tablenotes} \n"
+        printf "\footnotesize \n"
+        printf "\item \\textsc{Note:} %s \n", self.note
+        printf "\end{tablenotes} \n"
+        printf "\end{threeparttable} \n"
+    endif
+end function
 
-    string filename = self.filename
 
-    catch outfile "@filename" --quiet
+function string compile_texcode (const matrix mat,
+                                 const bundle self)
+    /* Compilation of tex-code.
+       return: string holding tex-code; if an error occurs, abort. */
+
+    string buffer
+
+    catch outfile --buffer=buffer
         print_document_head(self.todoc)
 
-        printf "\begin{table}[htbp]\n"
+        printf "\begin{table}[%s]\n", self.position
         printf "\centering\n"
         printf "%s \n", self.fontsize
 
@@ -131,28 +213,18 @@ function scalar write_table (const matrix mat, const bundle self)
         printf "\bottomrule\n"
         printf "\end{tabular}\n"
 
-        if nelem(self.note)
-            printf "\begin{tablenotes} \n"
-            printf "\footnotesize \n"
-            printf "\item \\textsc{Note:} %s \n", self.note
-            printf "\end{tablenotes} \n"
-            printf "\end{threeparttable} \n"
-        endif
+        write_note(self)
 
-        printf "\caption{@capt}\n"
-        printf "\label{@lab}\n"
+        printf "\caption{%s}\n", self.caption
+        printf "\label{%s}\n", self.label
         printf "\end{table}\n"
 
-        print_document_end(todoc)
+        print_document_end(self.todoc)
     end outfile
 
-    scalar err = $error
+    errorif($error, "Failed to write tex-file. Abort")
 
-    if err
-        printf "\nERROR: Failed to write tex-file.\n"
-    endif
-
-    return err
+    return buffer
 end function
 
 

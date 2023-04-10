@@ -8,15 +8,16 @@ include "./src/latextab.inp" --force
 # include string_utils.gfn
 
 
-function void test_write_column_allignment (void)
-    print "Start testing function write_column_allignment()"
+function void test_write_column_allign_clabs (void)
+    print "Start testing function write_column_allignment() with column labels"
 
     # Given
-    bundle self = _(clabels = defarray("A", "B"))
+    bundle self = _(rlabels = defarray("A"),
+                    ncols = 2)
     string actual
 
     # When
-    string expected = sprintf("\begin{tabular}{lc}\n")
+    string expected = sprintf("\begin{tabular}{lcc}\n")
 
     outfile --buffer=actual
         write_column_allignment(self)
@@ -25,18 +26,39 @@ function void test_write_column_allignment (void)
     # Then
     assert(actual == expected)
 end function
-test_write_column_allignment()
+test_write_column_allign_clabs()
+
+
+function void test_write_column_allign (void)
+    print "Start testing function write_column_allignment() without column labels"
+
+    # Given
+    bundle self = _(ncols = 2)
+    string actual
+
+    # When
+    string expected = sprintf("\begin{tabular}{cc}\n")
+
+    outfile --buffer=actual
+        write_column_allignment(self)
+    end outfile
+
+    # Then
+    assert(actual == expected)
+end function
+test_write_column_allign()
 
 
 function void test_write_column_labels (void)
     print "Start testing function write_column_labels()"
 
     # Given
-    bundle self = _(clabels = defarray("A", "B"))
+    bundle self = _(clabels = defarray("A", "B"),
+                    bold_clabels = TRUE)
     string actual
 
     # When
-    string expected = sprintf("A & B\n")
+    string expected = sprintf("\\textbf{A} & \\textbf{B}\n")
 
     outfile --buffer=actual
         write_column_labels(self)
@@ -91,8 +113,160 @@ end function
 test_write_values_no_rlabels()
 
 
-**Teste write_table()**
+function void test_write_file (void)
+    print "Start testing function write_file()"
+
+    # Given
+    string expected = "some text code"
+    string filename = sprintf("%s/foo.tex", $dotdir)
+
+    # When
+    write_file(expected, filename)
+    string actual = readfile(filename)
+
+    # Then
+    assert(actual == expected)
+end function
+test_write_file()
+
+
+function void test_compile_texcode_default (void)
+    print "Start testing function compile_texcode() with default values"
+
+    # Given
+    matrix mat = {1, 2; 3, 4; 5, 6}
+    bundle self = _(digits = 3 * ones(cols(mat), 1))
+    self += default_values()
+    self.ncols = 2
+
+    # When
+    string actual = compile_texcode(mat, self)
+    print actual
+
+    # Then
+    # TODO: "actual" is not asserted here. Copy and paste it to some tex-doc. instead.
+end function
+test_compile_texcode_default()
+
+
+function void test_comp_texcode_default_doc (void)
+    print "Start testing function compile_texcode() with default values but as a working document"
+
+    # Given
+    matrix mat = {1, 2; 3, 4; 5, 6}
+    bundle self = _(digits = 3 * ones(cols(mat), 1))
+    self += default_values()
+    self.ncols = 2
+    self.todoc = TRUE
+
+    # When
+    string actual = compile_texcode(mat, self)
+    print actual
+
+    # Then
+    # TODO: "actual" is not asserted here. Copy and paste it to some tex-doc. instead.
+end function
+test_comp_texcode_default_doc()
+
+
+function void test_comp_texcode_clabels_doc (void)
+    print "Start testing function compile_texcode() with column labels but as a working document"
+
+    # Given
+    matrix mat = {1, 2; 3, 4; 5, 6}
+    bundle self = _(digits = 3 * ones(cols(mat), 1))
+    self += default_values()
+    self.ncols = 2
+    self.todoc = TRUE
+    self.clabels = defarray("A", "B")
+
+    # When
+    string actual = compile_texcode(mat, self)
+    print actual
+
+    # Then
+    # TODO: "actual" is not asserted here. Copy and paste it to some tex-doc. instead.
+end function
+test_comp_texcode_clabels_doc()
+
+
+function void test_comp_texcode_crlabels_doc (void)
+    print "Start testing function compile_texcode() with column and row labels but as a working document"
+
+    # Given
+    matrix mat = {1, 2; 3, 4; 5, 6}
+    bundle self = _(digits = 3 * ones(cols(mat), 1))
+    self += default_values()
+    self.ncols = 2
+    self.todoc = TRUE
+    self.clabels = defarray("description", "A", "B")
+    self.rlabels = defarray("R1", "R2", "R3")
+
+    # When
+    string actual = compile_texcode(mat, self)
+    print actual
+
+    # Then
+    # TODO: "actual" is not asserted here. Copy and paste it to some tex-doc. instead.
+end function
+test_comp_texcode_crlabels_doc()
+
+
+function void test_comp_texcode_full (void)
+    print "Start testing function compile_texcode() using all features available"
+
+    # Given
+    matrix mat = {1, 2; 3, 4; 5, 6}
+    bundle self = _(digits = 3 * ones(cols(mat), 1))
+    self += default_values()
+    self.ncols = 2
+    self.todoc = TRUE
+    self.clabels = defarray("description", "A", "B")
+    self.rlabels = defarray("R1", "R2", "R3")
+    self.caption = "This is some title"
+    self.label = "tab:foo"
+    self.note = "Here is some descriptive text of the table"
+    self.fontsize = "\small"
+
+    # When
+    string actual = compile_texcode(mat, self)
+    print actual
+
+    # Then
+    # TODO: "actual" is not asserted here. Copy and paste it to some tex-doc. instead.
+end function
+test_comp_texcode_full()
+
+
+function void test_latextab (void)
+    print "Start testing function latextab() using all features available"
+
+    # Given
+    matrix mat = {1, 2; 3, 4; 5, 6}
+    bundle self = _(digits = 3 * ones(cols(mat), 1))
+    self += default_values()
+    self.todoc = TRUE
+    self.clabels = defarray("description", "A", "B")
+    self.rlabels = defarray("R1", "R2", "R3")
+    self.bold_rlabels = TRUE
+    self.caption = "This is some title"
+    self.label = "tab:foo"
+    self.note = "Here is some descriptive text of the table"
+    self.fontsize = "\small"
+    self.digits = {0, 1}
+    self.position = "htb"
+
+    # When
+    string actual = latextab(mat, self)
+    print actual
+
+    # Then
+    # TODO: "actual" is not asserted here. Copy and paste it to some tex-doc. instead.
+end function
+test_latextab()
 
 
 print "Successfully passed all tests."
 quit
+
+

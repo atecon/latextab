@@ -4,31 +4,34 @@ include latextab.gfn
 open denmark.gdt -q
 
 # Compute some stats and add to matrix
-matrix mstat = zeros(2, 3)
+matrix mstat = {}
 list ylist = LRM LRY
-list dylist = diff(ylist)
-loop foreach i dylist
-    mstat[i,] = min($i) ~ max($i) ~ mean($i)
+loop foreach i ylist
+    mstat |= (min($i) ~ max($i))
 endloop
 
-# Specify table strings
-string column_labels = "Variable Min Max Mean"
-cnameset(mstat, "@column_labels")
-string row_labels = "LRM LRY"
-rnameset(mstat, "@row_labels")
-string note = "Add a note"
-string path  = sprintf("%s/ltab.tex", $workdir)  # SET THE PATH
-scalar dec = 3
-string fs = "\small"
-string label = ""
-string caption = "Descriptive Statistics"
+cnameset(mstat, defarray("min", "max"))
+rnameset(mstat, varnames(ylist))
+print mstat
 
-# Compile and write the tex-file
-latextab(mstat, column_labels, row_labels, caption, label,
-         note, path, dec, fs)
+# Write the texcode snipped
+string texcode = latextab(mstat)
+texcode
 
-# Compile and write the tex-file as seperate d ocument
-scalar TODOC = TRUE
-string path  = sprintf("%s/ltab_document.tex", $workdir)  # SET THE PATH
-latextab(mstat, column_labels, row_labels, caption, label,
-         note, path, dec, fs, TODOC)
+# Write the texcode with document environment
+string texcode = latextab(mstat, _(todoc = TRUE))
+texcode
+
+
+# Show all options
+bundle params = _(todoc = TRUE,
+                    clabels = defarray("description", "Min()", "Max"),
+                    rlabels = defarray("Money", "Output"),
+                    bold_rlabels = TRUE,
+                    caption = "This is some title",
+                    label = "tab:foo",
+                    note = "Here is some descriptive text of the table",
+                    digits = {1, 3} \
+                    )
+string texcode = latextab(mstat, params)
+print texcode

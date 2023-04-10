@@ -1,11 +1,11 @@
 author = Artur Tarassow
 email = atecon@posteo.de
-version = 0.3
-date = 2023-03-20
+version = 1.0
+date = 2023-04-10
 description = Write matrix as Latex table
 tags = C88
 min-version = 2021a
 public = latextab
-help = latextab_help.txt
+help = latextab_help.md
 sample-script = latextab_sample.inp
 data-requirement = no-data-ok
