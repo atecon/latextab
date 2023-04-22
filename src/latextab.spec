@@ -1,7 +1,7 @@
 author = Artur Tarassow
 email = atecon@posteo.de
 version = 1.0
-date = 2023-04-10
+date = 2023-04-22
 description = Write matrix as Latex table
 tags = C88
 min-version = 2021a
