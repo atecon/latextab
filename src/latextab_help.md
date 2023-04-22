@@ -21,10 +21,11 @@ Latex tabular environment.
 # Public function
 
 ```
-function string latextab(const matrix mat, const bundle params)
+function string latextab(const matrix mat, const bundle params[null])
 ```
 
-Create the Latex-code for writing `mat` as a Latex-table.
+Create the Latex-code for writing a matrix (optionally with labels) as a 
+Latex-table.
 
 ## Parameters
 
@@ -35,38 +36,33 @@ Create the Latex-code for writing `mat` as a Latex-table.
 The bundle `params` includes the following parameters which can be adapted by
 the user:
 
-	+ `bold_clabels`: `bool`, Switch to make bold column labels (default:
-TRUE)
-	+ `bold_rlabels`: `bool`, Switch to make bold row labels (default: TRUE)
-	+ `caption`: `string`, Caption (title) of the table.
-	+ `clabels`: `strings`, Array of column labels (optional). Must equal
-the
-	    number of columns, `c`, of `mat` if no row-labels are passed.
-	    Otherwise, `c+1` columns labels must be passed.
-	+ `digits`, `matrix`, Vector holding the number of digits for each column
-	    (default: 3 digits for each column)
-	+ `enforce_decpoint`: `bool`, Enforce writing decimal points (default:
-		TRUE)
-	+ `filename`: `string`, Full path of the tex-code being stored
-(optional).
-	+ `fontsize`: `string`, Set the font-size of the table (default:
-		`\normalsize`)
-	+ `label`: `string`, Label of the tex-table.
-	+ `note`: `string`, Add a note below the table.
-	+ `position`, `string`, Position the table in the tex-documents
-(default:
-		"htbp")
-	+ `rlabels`: `strings`, Array of row labels (optional). Must equal the
-	    number of rows of `mat`.
-	+ `todoc`: `bool`, Switch to add the document headers such that the
-	    tex-file can be compiled if set to TRUE (=1) (FALSE (=0) per
-default)
+- `bold_clabels`: bool, Switch to make bold column labels (default: TRUE).
++ `bold_rlabels`: `bool`, Switch to make bold row labels (default: TRUE).
++ `caption`: `string`, Caption (title) of the table.
++ `clabels`: `strings`, Array of column labels (optional).
+   Must equal the number of columns, `c`, of `mat` if no row-labels are passed.
+   Otherwise, `c+1` columns labels must be passed.
++ `digits`, `matrix`, Vector holding the number of digits for each column
+   (default: 3 digits for each column).
++ `enforce_decpoint`: `bool`, Enforce writing decimal points (default:
+   TRUE).
++ `filename`: `string`, Full path of the tex-code being stored (optional).
++ `fontsize`: `string`, Set the font-size of the table (default:
+  `\normalsize`).
++ `label`: `string`, Label of the tex-table.
++ `note`: `string`, Add a note below the table.
++ `position`, `string`, Position the table in the tex-documents (default:
+  `htbp`)
++ `rlabels`: `strings`, Array of row labels (optional). Must equal the
+   number of rows of `mat`.
++ `todoc`: `bool`, Switch to add the document headers such that the
+   tex-file can be compiled if set to TRUE (=1) (FALSE (=0) as default).
 
 ## Returns
 A string of the Latex-code is returned.
 Per default, the returned tex-file is only a snippet which can be included into
 an existing Latex document. Optionally, the tex file can be stored as a
-separate Tex document which can be compiled.*
+separate Tex document which can be compiled.
 
 
 # Changelog
