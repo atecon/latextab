@@ -19,12 +19,12 @@ string texcode = latextab(mstat)
 texcode
 
 # Write the texcode with document environment
-string texcode = latextab(mstat, _(todoc = TRUE))
+string texcode = latextab(mstat, _(asdoc = TRUE))
 texcode
 
 
 # Show all options
-bundle params = _(todoc = TRUE,
+bundle params = _(asdoc = TRUE,
                     clabels = defarray("description", "Min()", "Max"),
                     rlabels = defarray("Money", "Output"),
                     bold_rlabels = TRUE,

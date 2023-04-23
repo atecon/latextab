@@ -157,7 +157,7 @@ function void test_comp_texcode_default_doc (void)
     bundle self = _(digits = 3 * ones(cols(mat), 1))
     self += default_values()
     self.ncols = 2
-    self.todoc = TRUE
+    self.asdoc = TRUE
 
     # When
     string actual = compile_texcode(mat, self)
@@ -177,7 +177,7 @@ function void test_comp_texcode_clabels_doc (void)
     bundle self = _(digits = 3 * ones(cols(mat), 1))
     self += default_values()
     self.ncols = 2
-    self.todoc = TRUE
+    self.asdoc = TRUE
     self.clabels = defarray("A", "B")
 
     # When
@@ -198,7 +198,7 @@ function void test_comp_texcode_crlabels_doc (void)
     bundle self = _(digits = 3 * ones(cols(mat), 1))
     self += default_values()
     self.ncols = 2
-    self.todoc = TRUE
+    self.asdoc = TRUE
     self.clabels = defarray("description", "A", "B")
     self.rlabels = defarray("R1", "R2", "R3")
 
@@ -220,7 +220,7 @@ function void test_comp_texcode_full (void)
     bundle self = _(digits = 3 * ones(cols(mat), 1))
     self += default_values()
     self.ncols = 2
-    self.todoc = TRUE
+    self.asdoc = TRUE
     self.clabels = defarray("description", "A", "B")
     self.rlabels = defarray("R1", "R2", "R3")
     self.caption = "This is some title"
@@ -245,7 +245,7 @@ function void test_latextab (void)
     matrix mat = {1, 2; 3, 4; 5, 6}
     bundle self = _(digits = 3 * ones(cols(mat), 1))
     self += default_values()
-    self.todoc = TRUE
+    self.asdoc = TRUE
     self.clabels = defarray("description", "A", "B")
     self.rlabels = defarray("R1", "R2", "R3")
     self.bold_rlabels = TRUE

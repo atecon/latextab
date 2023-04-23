@@ -9,7 +9,7 @@ function bundle default_values (void)
     string self.note = ""
     string self.filename = ""
     string self.fontsize = ""
-    scalar self.todoc = FALSE
+    scalar self.asdoc = FALSE
     scalar self.bold_rlabels = FALSE
     scalar self.bold_clabels = TRUE
     scalar self.enforce_decpoint = TRUE
@@ -193,7 +193,7 @@ function string compile_texcode (const matrix mat,
     string buffer
 
     catch outfile --buffer=buffer
-        print_document_head(self.todoc)
+        print_document_head(self.asdoc)
 
         printf "\begin{table}[%s]\n", self.position
         printf "\centering\n"
@@ -219,7 +219,7 @@ function string compile_texcode (const matrix mat,
         printf "\label{%s}\n", self.label
         printf "\end{table}\n"
 
-        print_document_end(self.todoc)
+        print_document_end(self.asdoc)
     end outfile
 
     errorif($error, "Failed to write tex-file. Abort")
@@ -228,8 +228,8 @@ function string compile_texcode (const matrix mat,
 end function
 
 
-function void print_document_head (const bool todoc)
-    if todoc == TRUE
+function void print_document_head (const bool asdoc)
+    if asdoc == TRUE
         print "\documentclass{article}"
         print "\usepackage{booktabs}"
         print "\usepackage{threeparttable}"
@@ -239,8 +239,8 @@ function void print_document_head (const bool todoc)
 end function
 
 
-function void print_document_end (const bool todoc)
-    if todoc == TRUE
+function void print_document_end (const bool asdoc)
+    if asdoc == TRUE
         print "\end{document}"
     endif
 end function

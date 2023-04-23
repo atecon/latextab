@@ -2,15 +2,6 @@
 
 This package creates Latex code representing a gretl matrix as a Latex table.
 
-In order to work, you need to load the both the `threeparttable` and `booktabs`
-packages when compiling your Latex document. So please add the following lines
-to your document:
-
-```
-\usepackage{booktabs}
-\usepackage{threeparttable}
-```
-
 Please report bugs or comments on the gretl mailing list, write to
 atecon@posteo.de or report an issue on github
 (https://github.com/atecon/latextab).
@@ -27,6 +18,16 @@ function string latextab(const matrix mat, const bundle params[null])
 
 Create the Latex-code for writing a matrix (optionally with labels) as a
 Latex-table.
+
+**Note**: When the boolean switch `asdoc` is set to `FALSE` (see below), one
+needs to load both the `threeparttable` and `booktabs` packages when compiling
+the Latex document. So please add the following lines to your document:
+
+```
+\usepackage{booktabs}
+\usepackage{threeparttable}
+```
+
 
 ## Parameters
 
@@ -56,15 +57,15 @@ the user:
   `htbp`)
 - `rlabels`: `strings`, Array of row labels (optional). Must equal the
    number of rows of `mat`.
-- `todoc`: `bool`, Switch to add the document headers such that the
+- `asdoc`: `bool`, Switch to add the document headers such that the
    tex-file can be compiled if set to TRUE (=1) (FALSE (=0) as default).
 
 ## Returns
 
-A string of the Latex-code is returned.
-Per default, the returned tex-file is only a snippet which can be included into
-an existing Latex document. Optionally, the tex file can be stored as a
-separate Tex document which can be compiled.
+A string of the Latex-code is returned. Per default, the returned tex-file is
+only a snippet which can be included into an existing Latex document.
+Optionally, the tex file can be stored as a separate Tex document which can be
+compiled.
 
 
 # Changelog
@@ -75,7 +76,7 @@ separate Tex document which can be compiled.
 
 * **v0.3 (February 2023)**
     * Update help text
-    * Add new switch "todoc"
+    * Add new switch "asdoc"
     * Fix typos
 
 * **v0.22 (May 2017)**
