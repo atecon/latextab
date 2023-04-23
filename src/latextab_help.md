@@ -71,12 +71,12 @@ compiled.
 # Changelog
 
 * **v1.0 (April 2023)**
-    * Full refactoring incl. a new user-interface.
+    * Full refactoring incl. a new user-interface and some parameter renaming
     * Add unit-tests
 
 * **v0.3 (February 2023)**
     * Update help text
-    * Add new switch "asdoc"
+    * Add new switch "todoc"
     * Fix typos
 
 * **v0.22 (May 2017)**
