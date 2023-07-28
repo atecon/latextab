@@ -69,6 +69,7 @@ compiled.
 
 
 # Changelog
+
 * **v1.1 (July 2023)**
     * Bugfix: In case no row-labels were provided this provoked an error before.
 
