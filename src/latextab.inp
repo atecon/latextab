@@ -64,7 +64,7 @@ function string latextab (const matrix mat,
     add_rlabels(mat, &self)
     add_clabels(mat, &self)
 
-    errorif(nelem(self.rlabels) != self.nrows,
+    errorif(nelem(self.rlabels) > 0 && (nelem(self.rlabels) != self.nrows),
             "Number of rows must equal number of row labels. Abort.")
 
     if nelem(self.rlabels)

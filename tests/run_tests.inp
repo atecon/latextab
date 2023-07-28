@@ -266,6 +266,17 @@ end function
 test_latextab()
 
 
+function void test_no_rlabels (void)
+    print "Start testing case without any row labels"
+
+    # Given
+    matrix foo = mnormal(1, 2)
+
+    # When
+    latextab(foo)
+end function
+test_no_rlabels()
+
 print "Successfully passed all tests."
 quit
 
