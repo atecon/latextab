@@ -158,7 +158,9 @@ function void write_values (const matrix mat, const bundle self)
 
         loop j=1..cols(mat)
             if !ok(mat[i,j])
-                printf " & "
+                if j < cols(mat)
+                    printf "& "
+                endif
             else
                 string dec = sprintf("%d", self.digits[j])
                 printf "%.@decf", mat[i,j]

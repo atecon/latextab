@@ -70,6 +70,10 @@ compiled.
 
 # Changelog
 
+* **v1.2 (September 2024)**
+    * Bugfix: In case of empty cells, the number of ampersands does not match 
+the number of columns. This led to an error before.
+
 * **v1.1 (July 2023)**
     * Bugfix: In case no row-labels were provided this provoked an error before.
 

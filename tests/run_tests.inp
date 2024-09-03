@@ -87,7 +87,6 @@ function void test_write_column_labels_no (void)
     end outfile
 
     # Then
-    print actual expected
     assert(actual == expected)
 end function
 test_write_column_labels_no()
@@ -108,6 +107,8 @@ function void test_write_values_no_rlabels (void)
     end outfile
 
     # Then
+    print actual expected
+
     assert(expected == actual)
 end function
 test_write_values_no_rlabels()
