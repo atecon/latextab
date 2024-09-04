@@ -259,7 +259,7 @@ function void test_latextab (void)
 
     # When
     string actual = latextab(mat, self)
-    print actual
+    #print actual
 
     # Then
     # TODO: "actual" is not asserted here. Copy and paste it to some tex-doc. instead.
@@ -277,6 +277,29 @@ function void test_no_rlabels (void)
     latextab(foo)
 end function
 test_no_rlabels()
+
+
+
+function void test_empty_row (void)
+    print "Start testing function latextab() with a matrix with empty rows"
+
+    # Given
+    matrix mat = {1, 2; NA, NA; 5, 6}
+    string expected_s1 = "1.000 & 2.000 \\"
+    string expected_s2 = "&  \\"
+    string expected_s3 = "5.000 & 6.000 \\"
+
+    # When
+    string actual = latextab(mat) #, self)
+    print actual
+
+    # Then
+    assert(instring(actual, expected_s1) == TRUE)
+    assert(instring(actual, expected_s2) == TRUE)
+    assert(instring(actual, expected_s3) == TRUE)
+end function
+test_empty_row()
+
 
 print "Successfully passed all tests."
 quit
