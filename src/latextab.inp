@@ -1,7 +1,7 @@
 function bundle default_values (void)
     /* Set default values */
 
-    bundle self = null
+    bundle self
     strings self.clabels = array(0)
     strings self.rlabels = array(0)
     string self.caption = ""
